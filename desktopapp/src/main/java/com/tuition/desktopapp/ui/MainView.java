@@ -30,12 +30,15 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class MainView {
 
     private final StudentService studentService;
     private final AttendanceService attendanceService;
     private final SyncService syncService;
+
+    private final Stage stage;
     private final BorderPane root = new BorderPane();
 
     private final TextField studentIdField = new TextField();
@@ -53,10 +56,11 @@ public class MainView {
 
     public MainView(StudentService studentService,
                     AttendanceService attendanceService,
-                    SyncService syncService) {
+                    SyncService syncService, Stage stage) {
         this.studentService = studentService;
         this.attendanceService = attendanceService;
         this.syncService = syncService;
+        this.stage = stage;
         buildUi();
     }
 
@@ -74,6 +78,7 @@ public class MainView {
         root.setTop(buildHeader());
         root.setCenter(buildTabs());
         root.setStyle("-fx-background-color: linear-gradient(to bottom right, #f4efe5, #e6eef8);");
+        stage.setMaximized(true);
     }
 
     private Parent buildHeader() {
@@ -83,7 +88,7 @@ public class MainView {
         Label subtitle = new Label("Simple biometric registration, attendance scanning, and sync monitoring");
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #47607b;");
 
-        VBox box = new VBox(4, title, subtitle, button);
+        VBox box = new VBox(4, title, subtitle);
         box.setPadding(new Insets(0, 0, 16, 0));
         return box;
     }

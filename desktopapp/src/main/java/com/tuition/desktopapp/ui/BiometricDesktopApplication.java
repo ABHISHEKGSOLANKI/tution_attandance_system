@@ -27,7 +27,8 @@ public class BiometricDesktopApplication extends Application {
         MainView mainView = new MainView(
                 context.getBean(StudentService.class),
                 context.getBean(AttendanceService.class),
-                context.getBean(SyncService.class)
+                context.getBean(SyncService.class),
+                stage
         );
         Scene scene = new Scene(mainView.getRoot(), 1200, 780);
         stage.setTitle("Biometric Attendance System");
