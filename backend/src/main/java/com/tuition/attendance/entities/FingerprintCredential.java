@@ -1,5 +1,6 @@
-package com.tuition.attendance.model;
+package com.tuition.attendance.entities;
 
+import com.tuition.attendance.entities.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

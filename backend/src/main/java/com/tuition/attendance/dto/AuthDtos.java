@@ -14,12 +14,16 @@ public class AuthDtos {
 
     public record RegisterRequest(
             @NotBlank String name,
+            @NotBlank String firstName,
+            String middleName,
+            String lastName,
             @NotNull StudentClass studentClass,
-            @Email @NotBlank String email
+            @Email @NotBlank String email,
+            @NotBlank Long mobile
     ) { }
 
     public record LoginRequest(
-            @Email @NotBlank String email,
+            @NotBlank String name,
             @NotBlank String password
     ) { }
 
@@ -55,28 +59,19 @@ public class AuthDtos {
 
     public record AttendanceMarkResponse(String message, AttendanceView attendance) { }
 
-    public record StudentListItem(
+
+    public record AttendanceReportItem(
             Long id,
-            String name,
-            String email,
+            String studentName,
             StudentClass studentClass,
-            boolean approved,
-            boolean fingerprintRegistered,
-            double attendancePercentage
+            LocalDate attendanceDate,
+            String status,
+            LocalDateTime scannedAt
     ) { }
-
-    public record PendingRegistrationItem(Long id, String name, String email, StudentClass studentClass) { }
-
-    public record ApprovalResponse(String message) { }
 
     public record ChangePasswordRequest(
             @NotBlank String currentPassword,
             @Size(min = 6, max = 100) String newPassword
     ) { }
 
-    public record DailyAttendancePoint(LocalDate date, long presentCount) { }
-
-    public record MonthlyAttendancePoint(String month, long presentCount) { }
-
-    public record AdminAnalyticsResponse(List<DailyAttendancePoint> dailyAttendance, List<MonthlyAttendancePoint> monthlyAttendance, List<StudentListItem> studentWiseAttendance) { }
 }

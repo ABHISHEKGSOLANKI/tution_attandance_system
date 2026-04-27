@@ -1,7 +1,7 @@
 package com.tuition.attendance.repository;
 
-import com.tuition.attendance.model.FingerprintCredential;
-import com.tuition.attendance.model.User;
+import com.tuition.attendance.entities.FingerprintCredential;
+import com.tuition.attendance.entities.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

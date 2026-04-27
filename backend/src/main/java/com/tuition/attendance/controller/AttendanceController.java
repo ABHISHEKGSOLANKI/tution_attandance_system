@@ -2,7 +2,7 @@ package com.tuition.attendance.controller;
 
 import com.tuition.attendance.dto.AuthDtos;
 import com.tuition.attendance.model.StudentClass;
-import com.tuition.attendance.service.AttendanceService;
+import com.tuition.attendance.service.admin.AttendanceService;
 import com.tuition.attendance.service.FingerprintService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -29,8 +29,8 @@ public class AttendanceController {
         this.fingerprintService = fingerprintService;
     }
 
-    @PostMapping("/attendance/scan")
-    public AuthDtos.AttendanceMarkResponse scanFingerprint(@Valid @RequestBody AuthDtos.FingerprintScanRequest request) {
+    @PostMapping("/attendance/mark")
+    public AuthDtos.AttendanceMarkResponse markAttendance(@Valid @RequestBody AuthDtos.FingerprintScanRequest request) {
         return attendanceService.markByFingerprint(request);
     }
 
@@ -41,11 +41,7 @@ public class AttendanceController {
         fingerprintService.registerFingerprint(studentId, request);
     }
 
-    @GetMapping("/admin/students")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<AuthDtos.StudentListItem> students() {
-        return attendanceService.getAnalytics().studentWiseAttendance();
-    }
+
 
     @GetMapping("/admin/attendance")
     @PreAuthorize("hasRole('ADMIN')")
@@ -59,5 +55,16 @@ public class AttendanceController {
     @PreAuthorize("hasRole('ADMIN')")
     public AuthDtos.AdminAnalyticsResponse analytics() {
         return attendanceService.getAnalytics();
+    }
+
+    @GetMapping("/attendance/report")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AuthDtos.AttendanceReportItem> attendanceReport(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) StudentClass studentClass,
+            @RequestParam(required = false) String name) {
+        return attendanceService.attendanceReport(date, startDate, endDate, studentClass, name);
     }
 }

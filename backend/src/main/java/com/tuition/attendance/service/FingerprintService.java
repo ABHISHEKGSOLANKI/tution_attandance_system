@@ -2,9 +2,9 @@ package com.tuition.attendance.service;
 
 import com.tuition.attendance.dto.AuthDtos;
 import com.tuition.attendance.exception.ApiException;
-import com.tuition.attendance.model.FingerprintCredential;
+import com.tuition.attendance.entities.FingerprintCredential;
 import com.tuition.attendance.model.Role;
-import com.tuition.attendance.model.User;
+import com.tuition.attendance.entities.User;
 import com.tuition.attendance.repository.FingerprintCredentialRepository;
 import com.tuition.attendance.repository.UserRepository;
 import org.springframework.http.HttpStatus;

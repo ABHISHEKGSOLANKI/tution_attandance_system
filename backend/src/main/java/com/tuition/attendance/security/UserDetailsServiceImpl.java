@@ -1,6 +1,6 @@
 package com.tuition.attendance.security;
 
-import com.tuition.attendance.model.User;
+import com.tuition.attendance.entities.User;
 import com.tuition.attendance.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,25 +1,26 @@
-package com.tuition.attendance.service;
+package com.tuition.attendance.service.admin;
 
 import com.tuition.attendance.dto.AuthDtos;
 import com.tuition.attendance.exception.ApiException;
-import com.tuition.attendance.model.AttendanceRecord;
+import com.tuition.attendance.entities.AttendanceRecord;
 import com.tuition.attendance.model.Role;
 import com.tuition.attendance.model.StudentClass;
-import com.tuition.attendance.model.User;
+import com.tuition.attendance.entities.User;
 import com.tuition.attendance.repository.AttendanceRecordRepository;
 import com.tuition.attendance.repository.UserRepository;
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import com.tuition.attendance.service.FingerprintService;
+import com.tuition.attendance.service.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AttendanceService {
 
-    private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+
     private final AttendanceRecordRepository attendanceRepository;
     private final UserRepository userRepository;
     private final FingerprintService fingerprintService;
@@ -67,6 +68,42 @@ public class AttendanceService {
         return attendanceRepository.search(studentId, studentClass, date);
     }
 
+    public List<AuthDtos.AttendanceReportItem> attendanceReport(LocalDate date, LocalDate startDate, LocalDate endDate, StudentClass studentClass, String name) {
+        LocalDate effectiveStart = startDate;
+        LocalDate effectiveEnd = endDate;
+        if (date != null) {
+            effectiveStart = date;
+            effectiveEnd = date;
+        }
+        final LocalDate startFilter = effectiveStart;
+        final LocalDate endFilter = effectiveEnd;
+
+        String normalizedName = name == null ? "" : name.trim().toLowerCase(Locale.ROOT);
+
+        return attendanceRepository.findAll().stream()
+                .filter(record -> studentClass == null || record.getStudent().getStudentClass() == studentClass)
+                .filter(record -> startFilter == null || !record.getAttendanceDate().isBefore(startFilter))
+                .filter(record -> endFilter == null || !record.getAttendanceDate().isAfter(endFilter))
+                .filter(record -> normalizedName.isBlank()
+                        || record.getStudent().getName().toLowerCase(Locale.ROOT).contains(normalizedName))
+                .sorted((left, right) -> {
+                    int byDate = right.getAttendanceDate().compareTo(left.getAttendanceDate());
+                    if (byDate != 0) {
+                        return byDate;
+                    }
+                    return left.getStudent().getName().compareToIgnoreCase(right.getStudent().getName());
+                })
+                .map(record -> new AuthDtos.AttendanceReportItem(
+                        record.getId(),
+                        record.getStudent().getName(),
+                        record.getStudent().getStudentClass(),
+                        record.getAttendanceDate(),
+                        record.getStatus().name(),
+                        record.getScannedAt()
+                ))
+                .toList();
+    }
+
     public double calculateAttendancePercentage(Long studentId) {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Student not found"));
@@ -77,32 +114,5 @@ public class AttendanceService {
         return Math.round((presentDays * 10000.0) / totalDays) / 100.0;
     }
 
-    public AuthDtos.AdminAnalyticsResponse getAnalytics() {
-        LocalDate today = LocalDate.now();
-        List<AuthDtos.DailyAttendancePoint> daily = attendanceRepository.countDailyBetween(today.minusDays(14), today)
-                .stream()
-                .map(row -> new AuthDtos.DailyAttendancePoint((LocalDate) row[0], (Long) row[1]))
-                .toList();
 
-        List<AuthDtos.MonthlyAttendancePoint> monthly = new ArrayList<>();
-        for (int i = 5; i >= 0; i--) {
-            YearMonth month = YearMonth.now().minusMonths(i);
-            long count = attendanceRepository.countBetween(month.atDay(1), month.atEndOfMonth());
-            monthly.add(new AuthDtos.MonthlyAttendancePoint(month.format(MONTH_FORMATTER), count));
-        }
-
-        List<AuthDtos.StudentListItem> studentWise = userRepository.findByRoleAndApproved(Role.STUDENT, true).stream()
-                .map(student -> new AuthDtos.StudentListItem(
-                        student.getId(),
-                        student.getName(),
-                        student.getEmail(),
-                        student.getStudentClass(),
-                        student.isApproved(),
-                        fingerprintService.hasFingerprint(student),
-                        calculateAttendancePercentage(student.getId())
-                ))
-                .toList();
-
-        return new AuthDtos.AdminAnalyticsResponse(daily, monthly, studentWise);
-    }
 }

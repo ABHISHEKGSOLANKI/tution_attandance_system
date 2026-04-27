@@ -1,8 +1,8 @@
 package com.tuition.attendance.service;
 
 import com.tuition.attendance.dto.AuthDtos;
-import com.tuition.attendance.model.AttendanceRecord;
-import com.tuition.attendance.model.User;
+import com.tuition.attendance.entities.AttendanceRecord;
+import com.tuition.attendance.entities.User;
 
 public final class Mapper {
 
@@ -28,7 +28,7 @@ public final class Mapper {
                 attendanceRecord.getStudent().getName(),
                 attendanceRecord.getStudent().getStudentClass(),
                 attendanceRecord.getAttendanceDate(),
-                attendanceRecord.getFingerprintId(),
+                attendanceRecord.getAttendanceType().name(),
                 attendanceRecord.getScannedAt()
         );
     }

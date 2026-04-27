@@ -46,16 +46,4 @@ public class AuthController {
                                                @Valid @RequestBody AuthDtos.ChangePasswordRequest request) {
         return authService.changePassword(principal, request);
     }
-
-    @GetMapping("/admin/pending-registrations")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<AuthDtos.PendingRegistrationItem> pendingRegistrations() {
-        return authService.pendingRegistrations();
-    }
-
-    @PostMapping("/admin/pending-registrations/{studentId}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
-    public AuthDtos.ApprovalResponse approveRegistration(@PathVariable Long studentId) {
-        return authService.approveStudent(studentId);
-    }
 }

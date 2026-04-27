@@ -1,8 +1,8 @@
-package com.tuition.attendance.controller;
+package com.tuition.attendance.controller.student;
 
 import com.tuition.attendance.dto.AuthDtos;
 import com.tuition.attendance.security.UserPrincipal;
-import com.tuition.attendance.service.AttendanceService;
+import com.tuition.attendance.service.admin.AttendanceService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

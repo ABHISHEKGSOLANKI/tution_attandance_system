@@ -1,6 +1,6 @@
 package com.tuition.attendance.repository;
 
-import com.tuition.attendance.model.AttendanceRecord;
+import com.tuition.attendance.entities.AttendanceRecord;
 import com.tuition.attendance.model.StudentClass;
 import java.time.LocalDate;
 import java.util.List;
