@@ -1,10 +1,13 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import StudentDashboard from "./pages/StudentDashboard";
+import { getStoredAuth } from "./api/session";
+import Attendance from "./pages/Attendance";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
-import { getStoredAuth } from "./api/session";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Registration from "./pages/Registration";
+import Reports from "./pages/Reports";
+import StudentDashboard from "./pages/StudentDashboard";
 
 function ProtectedRoute({ children, role }) {
   const auth = getStoredAuth();
@@ -15,7 +18,7 @@ function ProtectedRoute({ children, role }) {
     return <Navigate to="/change-password" replace />;
   }
   if (role && auth.user?.role !== role) {
-    return <Navigate to={auth.user?.role === "ADMIN" ? "/admin" : "/student"} replace />;
+    return <Navigate to={auth.user?.role === "ADMIN" ? "/dashboard" : "/student"} replace />;
   }
   return children;
 }
@@ -36,10 +39,42 @@ export default function App() {
         }
       />
       <Route
-        path="/admin"
+        path="/dashboard"
         element={
           <ProtectedRoute role="ADMIN">
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute role="ADMIN">
+            <Navigate to="/dashboard" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/registration"
+        element={
+          <ProtectedRoute role="ADMIN">
+            <Registration />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/attendance"
+        element={
+          <ProtectedRoute role="ADMIN">
+            <Attendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute role="ADMIN">
+            <Reports />
           </ProtectedRoute>
         }
       />
