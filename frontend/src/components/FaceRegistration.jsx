@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { registerFaceSamples } from "../api/face";
 import Modal from "./Modal";
 
-export default function FaceRegistration() {
+export default function FaceRegistration( { activeTab } ) {
   const [studentId, setStudentId] = useState("");
   const [samples, setSamples] = useState([]);
   const [status, setStatus] = useState("Start the camera, then capture 3 to 5 clear face samples.");
@@ -13,10 +13,13 @@ export default function FaceRegistration() {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
-  useEffect(() => {
+useEffect(() => {
+  if (activeTab === "face") {
     startCamera();
-    return () => stopCamera();
-  }, []);
+  } else {
+    stopCamera();
+  }
+}, [activeTab]);
 
   function openModal(tone, title, message) {
     setModal({ open: true, tone, title, message });
@@ -115,7 +118,7 @@ export default function FaceRegistration() {
             <span>Student ID</span>
             <input
               type="text"
-              placeholder="Enter student ID"
+              placeholder="Enter user ID, username, or admission ID"
               value={studentId}
               onChange={(event) => setStudentId(event.target.value)}
             />
@@ -135,6 +138,7 @@ export default function FaceRegistration() {
         </div>
 
         <div className="status-banner">{status}</div>
+        <p className="helper-text">Use the approved student's database ID, username, or admission ID so attendance can be written back to the backend.</p>
 
         <div className="shot-grid">
           {samples.map((image, index) => (

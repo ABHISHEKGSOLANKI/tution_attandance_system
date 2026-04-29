@@ -28,8 +28,8 @@ export default function Registration() {
         </div>
 
         <div className="tab-content">
-          {activeTab === "face" && <FaceRegistration />}
-          {activeTab === "approval" && <ApprovalRequests />}
+          {activeTab === "face" && <FaceRegistration activeTab={activeTab} />}
+          {activeTab === "approval" && <ApprovalRequests activeTab={activeTab} />}
         </div>
       </div>
     </Layout>

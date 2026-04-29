@@ -1,37 +1,48 @@
 package com.tuition.attendance.service.admin;
 
+import com.tuition.attendance.dto.AttendanceDtos;
 import com.tuition.attendance.dto.AuthDtos;
-import com.tuition.attendance.exception.ApiException;
+import com.tuition.attendance.dto.StudentDtos;
 import com.tuition.attendance.entities.AttendanceRecord;
+import com.tuition.attendance.entities.User;
+import com.tuition.attendance.exception.ApiException;
+import com.tuition.attendance.model.AttendanceType;
 import com.tuition.attendance.model.Role;
 import com.tuition.attendance.model.StudentClass;
-import com.tuition.attendance.entities.User;
 import com.tuition.attendance.repository.AttendanceRecordRepository;
 import com.tuition.attendance.repository.UserRepository;
+import com.tuition.attendance.service.Mapper;
+import com.tuition.attendance.service.biometric.FaceService;
+import com.tuition.attendance.service.biometric.FingerprintService;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import com.tuition.attendance.service.FingerprintService;
-import com.tuition.attendance.service.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AttendanceService {
-
+    private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     private final AttendanceRecordRepository attendanceRepository;
     private final UserRepository userRepository;
     private final FingerprintService fingerprintService;
+    private final FaceService faceService;
 
-    public AttendanceService(AttendanceRecordRepository attendanceRepository, UserRepository userRepository, FingerprintService fingerprintService) {
+    public AttendanceService(AttendanceRecordRepository attendanceRepository,
+                             UserRepository userRepository,
+                             FingerprintService fingerprintService,
+                             FaceService faceService) {
         this.attendanceRepository = attendanceRepository;
         this.userRepository = userRepository;
         this.fingerprintService = fingerprintService;
+        this.faceService = faceService;
     }
 
-    public AuthDtos.AttendanceMarkResponse markByFingerprint(AuthDtos.FingerprintScanRequest request) {
+    public AttendanceDtos.AttendanceMarkResponse markAttendance(AttendanceDtos.BiometricScanRequest request) {
         User student = fingerprintService.resolveStudent(request.fingerprintId());
         if (student.getRole() != Role.STUDENT) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Only students can mark attendance");
@@ -48,10 +59,53 @@ public class AttendanceService {
         AttendanceRecord record = new AttendanceRecord();
         record.setStudent(student);
         record.setAttendanceDate(today);
-        record.setFingerprintId(request.fingerprintId());
+        record.setAttendanceType(AttendanceType.FINGERPRINT);
         attendanceRepository.save(record);
 
-        return new AuthDtos.AttendanceMarkResponse("Attendance marked successfully", Mapper.toAttendanceView(record));
+        return new AttendanceDtos.AttendanceMarkResponse("Attendance marked successfully", Mapper.toAttendanceView(record));
+    }
+
+    public AttendanceDtos.AttendanceMarkResponse markAttendanceByFace(AttendanceDtos.FaceAttendanceMarkRequest request) {
+        User student = resolveStudentForFaceAttendance(request.studentId());
+        if (student.getRole() != Role.STUDENT) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only students can mark attendance");
+        }
+        if (!student.isApproved()) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Student is not approved for attendance yet");
+        }
+
+        LocalDate attendanceDate = request.timestamp().toLocalDate();
+        attendanceRepository.findByStudentIdAndAttendanceDate(student.getId(), attendanceDate).ifPresent(existing -> {
+            throw new ApiException(HttpStatus.CONFLICT, "Attendance already marked for today");
+        });
+
+        AttendanceRecord record = new AttendanceRecord();
+        record.setStudent(student);
+        record.setAttendanceDate(attendanceDate);
+        record.setAttendanceType(AttendanceType.FACE);
+        record.setScannedAt(request.timestamp());
+        attendanceRepository.save(record);
+
+        return new AttendanceDtos.AttendanceMarkResponse("Attendance marked successfully", Mapper.toAttendanceView(record));
+    }
+
+    private User resolveStudentForFaceAttendance(String studentIdentifier) {
+        String normalized = studentIdentifier == null ? "" : studentIdentifier.trim();
+        if (normalized.isBlank()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Student identifier is required");
+        }
+
+        try {
+            Long numericId = Long.parseLong(normalized);
+            return userRepository.findById(numericId)
+                    .orElseGet(() -> userRepository.findByAdmissionIdIgnoreCase(normalized)
+                            .orElseGet(() -> userRepository.findByUsernameIgnoreCase(normalized)
+                                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Student not found"))));
+        } catch (NumberFormatException ignored) {
+            return userRepository.findByAdmissionIdIgnoreCase(normalized)
+                    .orElseGet(() -> userRepository.findByUsernameIgnoreCase(normalized)
+                            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Student not found")));
+        }
     }
 
     public AuthDtos.StudentDashboardResponse getStudentDashboard(Long studentId) {
@@ -68,7 +122,7 @@ public class AttendanceService {
         return attendanceRepository.search(studentId, studentClass, date);
     }
 
-    public List<AuthDtos.AttendanceReportItem> attendanceReport(LocalDate date, LocalDate startDate, LocalDate endDate, StudentClass studentClass, String name) {
+    public List<AttendanceDtos.AttendanceReportItem> attendanceReport(LocalDate date, LocalDate startDate, LocalDate endDate, StudentClass studentClass, String name) {
         LocalDate effectiveStart = startDate;
         LocalDate effectiveEnd = endDate;
         if (date != null) {
@@ -77,7 +131,6 @@ public class AttendanceService {
         }
         final LocalDate startFilter = effectiveStart;
         final LocalDate endFilter = effectiveEnd;
-
         String normalizedName = name == null ? "" : name.trim().toLowerCase(Locale.ROOT);
 
         return attendanceRepository.findAll().stream()
@@ -93,7 +146,7 @@ public class AttendanceService {
                     }
                     return left.getStudent().getName().compareToIgnoreCase(right.getStudent().getName());
                 })
-                .map(record -> new AuthDtos.AttendanceReportItem(
+                .map(record -> new AttendanceDtos.AttendanceReportItem(
                         record.getId(),
                         record.getStudent().getName(),
                         record.getStudent().getStudentClass(),
@@ -114,5 +167,32 @@ public class AttendanceService {
         return Math.round((presentDays * 10000.0) / totalDays) / 100.0;
     }
 
+    public AttendanceDtos.AdminAnalyticsResponse getAnalytics() {
+        LocalDate today = LocalDate.now();
+        List<AttendanceDtos.DailyAttendancePoint> daily = attendanceRepository.countDailyBetween(today.minusDays(14), today)
+                .stream()
+                .map(row -> new AttendanceDtos.DailyAttendancePoint((LocalDate) row[0], (Long) row[1]))
+                .toList();
 
+        List<AttendanceDtos.MonthlyAttendancePoint> monthly = new ArrayList<>();
+        for (int i = 5; i >= 0; i--) {
+            YearMonth month = YearMonth.now().minusMonths(i);
+            long count = attendanceRepository.countBetween(month.atDay(1), month.atEndOfMonth());
+            monthly.add(new AttendanceDtos.MonthlyAttendancePoint(month.format(MONTH_FORMATTER), count));
+        }
+
+        List<StudentDtos.StudentListItem> studentWise = userRepository.findByRoleAndApproved(Role.STUDENT, true).stream()
+                .map(student -> new StudentDtos.StudentListItem(
+                        student.getId(),
+                        student.getName(),
+                        student.getEmail(),
+                        student.getStudentClass(),
+                        student.isApproved(),
+                        faceService.hasFaceRegistered(student),
+                        calculateAttendancePercentage(student.getId())
+                ))
+                .toList();
+
+        return new AttendanceDtos.AdminAnalyticsResponse(daily, monthly, studentWise);
+    }
 }

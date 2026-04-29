@@ -2,7 +2,7 @@ import axios from "axios";
 import { clearStoredAuth, getStoredAuth } from "./session";
 
 const client = axios.create({
-  baseURL: "http://localhost:8082/api"
+  baseURL: "http://localhost:8082"
 });
 
 client.interceptors.request.use((config) => {

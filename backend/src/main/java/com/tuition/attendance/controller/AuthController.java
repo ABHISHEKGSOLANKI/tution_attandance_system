@@ -1,21 +1,21 @@
 package com.tuition.attendance.controller;
 
 import com.tuition.attendance.dto.AuthDtos;
+import com.tuition.attendance.dto.RegistrationRequestDTO;
 import com.tuition.attendance.security.UserPrincipal;
 import com.tuition.attendance.service.AuthService;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -24,8 +24,8 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/register")
-    public AuthDtos.RegistrationResponse register(@Valid @RequestBody AuthDtos.RegisterRequest request) {
+    @PostMapping(value = "/register", consumes = {"multipart/form-data"})
+    public AuthDtos.RegistrationResponse register(@Valid @ModelAttribute RegistrationRequestDTO request) {
         return authService.registerStudent(request);
     }
 

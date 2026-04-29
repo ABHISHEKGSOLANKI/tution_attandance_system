@@ -1,9 +1,12 @@
 package com.tuition.attendance.service;
 
 import com.tuition.attendance.dto.AuthDtos;
-import com.tuition.attendance.exception.ApiException;
-import com.tuition.attendance.model.Role;
+import com.tuition.attendance.dto.RegistrationRequestDTO;
+import com.tuition.attendance.entities.PendingRegistration;
 import com.tuition.attendance.entities.User;
+import com.tuition.attendance.exception.ApiException;
+import com.tuition.attendance.model.RequestStatus;
+import com.tuition.attendance.repository.PendingRegistrationRepository;
 import com.tuition.attendance.repository.UserRepository;
 import com.tuition.attendance.security.JwtService;
 import com.tuition.attendance.security.UserPrincipal;
@@ -14,43 +17,51 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final PendingRegistrationRepository pendingRegistrationRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final LocalStorageService localStorageService;
 
     public AuthService(UserRepository userRepository,
+                       PendingRegistrationRepository pendingRegistrationRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       LocalStorageService localStorageService) {
         this.userRepository = userRepository;
+        this.pendingRegistrationRepository = pendingRegistrationRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.localStorageService = localStorageService;
     }
 
-    public AuthDtos.RegistrationResponse registerStudent(AuthDtos.RegisterRequest request) {
-        String username = request.name().toLowerCase().trim();
-        if (userRepository.existsByNameIgnoreCase(username)) {
-            throw new ApiException(HttpStatus.CONFLICT, "Username already registered");
+    public AuthDtos.RegistrationResponse registerStudent(RegistrationRequestDTO request) {
+        String email = request.getEmail().trim().toLowerCase();
+        String admissionId = request.getAdmissionId().trim();
+        if (userRepository.existsByEmailIgnoreCase(email) || pendingRegistrationRepository.existsByEmailIgnoreCase(email)) {
+            throw new ApiException(HttpStatus.CONFLICT, "Email already submitted");
+        }
+        if (userRepository.existsByAdmissionIdIgnoreCase(admissionId) || pendingRegistrationRepository.existsByAdmissionIdIgnoreCase(admissionId)) {
+            throw new ApiException(HttpStatus.CONFLICT, "Admission ID already submitted");
         }
 
-        User user = new User();
-        user.setName(request.name());
-        user.setFirstName(request.firstName());
-        user.setMiddleName(request.middleName());
-        user.setLastName(request.lastName());
-        user.setEmail(request.email());
-        user.setStudentClass(request.studentClass());
-        user.setRole(Role.STUDENT);
-        user.setApproved(false);
-        user.setPasswordChangeRequired(false);
-        user.setPasswordHash(null);
-        user.setMobile(request.mobile());
-        userRepository.save(user);
+        PendingRegistration registration = new PendingRegistration();
+        registration.setFirstName(request.getFirstName().trim());
+        registration.setMiddleName(request.getMiddleName() == null ? null : request.getMiddleName().trim());
+        registration.setLastName(request.getLastName().trim());
+        registration.setMobile(request.getMobile().trim());
+        registration.setEmail(email);
+        registration.setAdmissionId(admissionId);
+        registration.setStandard(request.getStandard());
+        registration.setPhotoUrl(localStorageService.storeRegistrationPhoto(request.getPhoto(), admissionId));
+        registration.setStatus(RequestStatus.PENDING);
+        pendingRegistrationRepository.save(registration);
 
         return new AuthDtos.RegistrationResponse("Registration request submitted. Please wait for admin approval.");
     }
 
     public AuthDtos.AuthResponse login(AuthDtos.LoginRequest request) {
-        String username = request.name().toLowerCase().trim();
-        User user = userRepository.findByNameIgnoreCase(username)
+        String username = request.username().toLowerCase().trim();
+        User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
         if (!user.isApproved()) {
@@ -59,13 +70,15 @@ public class AuthService {
         if (user.getPasswordHash() == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
-        return new AuthDtos.AuthResponse(jwtService.generateToken(user.getEmail(), user.getRole().name()), Mapper.toUserSummary(user));
+        return new AuthDtos.AuthResponse(jwtService.generateToken(user.getUsername(), user.getRole().name()), Mapper.toUserSummary(user));
     }
+
     public AuthDtos.UserSummary currentUser(UserPrincipal principal) {
         return userRepository.findById(principal.getId())
                 .map(Mapper::toUserSummary)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
     }
+
     public AuthDtos.UserSummary changePassword(UserPrincipal principal, AuthDtos.ChangePasswordRequest request) {
         User user = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));

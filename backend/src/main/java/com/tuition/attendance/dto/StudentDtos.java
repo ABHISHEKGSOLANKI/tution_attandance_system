@@ -12,13 +12,13 @@ public class StudentDtos {
             String email,
             StudentClass studentClass,
             boolean approved,
-            boolean fingerprintRegistered,
+            boolean biometricFaceRegistered,
             double attendancePercentage
     ) { }
 
     public record AdminAnalyticsResponse(
-            List<AuthDtos.DailyAttendancePoint> dailyAttendance,
-            List<AuthDtos.MonthlyAttendancePoint> monthlyAttendance,
+            List<AttendanceDtos.DailyAttendancePoint> dailyAttendance,
+            List<AttendanceDtos.MonthlyAttendancePoint> monthlyAttendance,
             List<StudentListItem> studentWiseAttendance
     ) { }
 

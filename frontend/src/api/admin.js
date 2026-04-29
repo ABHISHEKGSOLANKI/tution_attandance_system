@@ -3,9 +3,9 @@ import client from "./client";
 export async function getDashboardSummary() {
   const today = new Date().toISOString().slice(0, 10);
   const [studentsResponse, pendingResponse, reportResponse] = await Promise.all([
-    client.get("/admin/students"),
-    client.get("/auth/admin/pending-registrations"),
-    client.get("/attendance/report", { params: { date: today } })
+    client.get("/admin/dashboard/students"),
+    client.get("/admin/registration/pending-registrations"),
+    client.get("/admin/attendance/report", { params: { date: today } })
   ]);
 
   return {
@@ -16,17 +16,17 @@ export async function getDashboardSummary() {
 }
 
 export async function getPendingRegistrations() {
-  const response = await client.get("/auth/admin/pending-registrations");
+  const response = await client.get("/admin/registration/pending-registrations");
   return response.data;
 }
 
-export async function approveRegistration(studentId) {
-  const response = await client.post(`/auth/admin/pending-registrations/${studentId}/approve`);
+export async function approveRegistration(registrationId) {
+  const response = await client.post(`/admin/registration/pending-registrations/${registrationId}/approve`);
   return response.data;
 }
 
-export async function rejectRegistration(studentId) {
-  const response = await client.post(`/auth/admin/pending-registrations/${studentId}/reject`);
+export async function rejectRegistration(registrationId) {
+  const response = await client.post(`/admin/registration/pending-registrations/${registrationId}/reject`);
   return response.data;
 }
 
@@ -34,6 +34,6 @@ export async function getAttendanceReport(filters) {
   const params = Object.fromEntries(
     Object.entries(filters).filter(([, value]) => value !== "" && value !== null && value !== undefined)
   );
-  const response = await client.get("/attendance/report", { params });
+  const response = await client.get("/admin/attendance/report", { params });
   return response.data;
 }

@@ -1,4 +1,4 @@
-package com.tuition.attendance.service;
+package com.tuition.attendance.service.biometric;
 
 import com.tuition.attendance.dto.AuthDtos;
 import com.tuition.attendance.exception.ApiException;

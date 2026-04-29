@@ -32,9 +32,18 @@ public class AppProperties {
     }
 
     public static class Fingerprint {
+        private boolean rdEnabled;
+        private String rdCaptureUrl;
+        private String rdCaptureRequestXml;
         private boolean sdkEnabled;
         private String sdkLibraryPath;
         private int matchingThreshold = 95;
+        public boolean isRdEnabled() { return rdEnabled; }
+        public void setRdEnabled(boolean rdEnabled) { this.rdEnabled = rdEnabled; }
+        public String getRdCaptureUrl() { return rdCaptureUrl; }
+        public void setRdCaptureUrl(String rdCaptureUrl) { this.rdCaptureUrl = rdCaptureUrl; }
+        public String getRdCaptureRequestXml() { return rdCaptureRequestXml; }
+        public void setRdCaptureRequestXml(String rdCaptureRequestXml) { this.rdCaptureRequestXml = rdCaptureRequestXml; }
         public boolean isSdkEnabled() { return sdkEnabled; }
         public void setSdkEnabled(boolean sdkEnabled) { this.sdkEnabled = sdkEnabled; }
         public String getSdkLibraryPath() { return sdkLibraryPath; }

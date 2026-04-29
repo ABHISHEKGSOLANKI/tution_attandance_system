@@ -95,6 +95,9 @@ Edit [application.properties](./src/main/resources/application.properties):
 - `spring.datasource.*` for MySQL
 - `middleware.encryption.secret-key` for AES key material
 - `middleware.backend.base-url` and `middleware.backend.attendance-bulk-path` for sync target
+- `middleware.fingerprint.rd-enabled=true` to use the local Mantra RD capture service
+- `middleware.fingerprint.rd-capture-url` for the RD capture endpoint
+- `middleware.fingerprint.rd-capture-request-xml` for the capture request body
 - `middleware.fingerprint.sdk-enabled=true` to switch from mock to SDK implementation
 - `middleware.fingerprint.sdk-library-path` to point to the vendor DLL
 
@@ -129,6 +132,32 @@ Payload shape:
 On success, records are marked `is_synced = true`. On failure, they remain unsynced and retry in the next scheduled run.
 
 ## Plugging In A Real Fingerprint SDK
+
+## Mantra RD Service Mode
+
+If your scanner is working through the local RD service endpoint such as:
+
+- `http://127.0.0.1:11100/rd/capture`
+
+you can enable RD capture mode in `application.properties`:
+
+```properties
+middleware.fingerprint.rd-enabled=true
+middleware.fingerprint.sdk-enabled=false
+```
+
+What RD mode can do now:
+
+- Connect to the installed Mantra RD service
+- Send the PID XML capture request
+- Parse success/error details from the capture response
+- Confirm that live biometric capture is working
+
+Important limitation:
+
+- RD service returns an encrypted PID block for Aadhaar-style usage, not a reusable fingerprint template for local/offline matching.
+- Because of that, RD mode cannot safely power the project's local registration and local attendance matching workflow.
+- For true offline attendance, you still need the Mantra local SDK/DLL API that exposes capture template and match functions.
 
 Current SDK integration seam is:
 

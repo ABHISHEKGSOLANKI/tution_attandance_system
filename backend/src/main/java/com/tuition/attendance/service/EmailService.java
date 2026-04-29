@@ -22,10 +22,10 @@ public class EmailService {
         this.mailUsername = mailUsername;
     }
 
-    public void sendCredentials(String to, String name, String password) {
+    public void sendCredentials(String to, String name, String username, String password) {
         if (mailSender instanceof JavaMailSenderImpl sender
                 && (sender.getHost() == null || sender.getHost().isBlank())) {
-            log.info("SMTP not configured. Credentials for {}: {}", to, password);
+            log.info("SMTP not configured. Credentials for {} -> username: {}, password: {}", to, username, password);
             return;
         }
 
@@ -38,7 +38,7 @@ public class EmailService {
         message.setText(
                 "Hello " + name + ",\n\n"
                         + "Your account has been approved.\n"
-                        + "Email: " + to + "\n"
+                        + "Username: " + username + "\n"
                         + "Temporary Password: " + password + "\n\n"
                         + "Please log in and change your password immediately."
         );

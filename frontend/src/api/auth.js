@@ -8,7 +8,18 @@ export async function login(data) {
 }
 
 export async function register(data) {
-  const response = await client.post("/auth/register", data);
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== "") {
+      formData.append(key, value);
+    }
+  });
+
+  const response = await client.post("/auth/register", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
   return response.data;
 }
 

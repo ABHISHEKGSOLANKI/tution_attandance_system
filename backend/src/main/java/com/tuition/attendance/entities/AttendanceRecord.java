@@ -1,6 +1,5 @@
 package com.tuition.attendance.entities;
 
-import com.tuition.attendance.entities.User;
 import com.tuition.attendance.model.AttendanceStatus;
 import com.tuition.attendance.model.AttendanceType;
 import jakarta.persistence.Column;
@@ -51,15 +50,8 @@ public class AttendanceRecord {
     public void setAttendanceDate(LocalDate attendanceDate) { this.attendanceDate = attendanceDate; }
     public AttendanceStatus getStatus() { return status; }
     public void setStatus(AttendanceStatus status) { this.status = status; }
-
-    public AttendanceType getAttendanceType() {
-        return attendanceType;
-    }
-
-    public void setAttendanceType(AttendanceType attendanceType) {
-        this.attendanceType = attendanceType;
-    }
-
+    public AttendanceType getAttendanceType() { return attendanceType; }
+    public void setAttendanceType(AttendanceType attendanceType) { this.attendanceType = attendanceType; }
     public LocalDateTime getScannedAt() { return scannedAt; }
     public void setScannedAt(LocalDateTime scannedAt) { this.scannedAt = scannedAt; }
 }

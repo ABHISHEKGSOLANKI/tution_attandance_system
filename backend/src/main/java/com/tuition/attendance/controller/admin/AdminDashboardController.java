@@ -20,7 +20,7 @@ public class AdminDashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping("/admin/students")
+    @GetMapping("/students")
     @PreAuthorize("hasRole('ADMIN')")
     public List<StudentDtos.StudentListItem> students() {
         return dashboardService.getAnalytics().studentWiseAttendance();

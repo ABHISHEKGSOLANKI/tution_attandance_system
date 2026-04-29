@@ -31,6 +31,12 @@ public class StudentService {
 
     @Transactional
     public ApiDtos.StudentRegistrationResponse registerStudent(ApiDtos.StudentRegistrationRequest request) {
+        if (!fingerprintService.supportsLocalMatching()) {
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    fingerprintService.providerName() + " capture is connected, but it cannot provide reusable local templates for offline registration/matching. Use a local Mantra SDK integration instead of RD-only mode."
+            );
+        }
         if (studentRepository.existsByStudentId(request.studentId())) {
             throw new ApiException(HttpStatus.CONFLICT, "Student ID already registered");
         }

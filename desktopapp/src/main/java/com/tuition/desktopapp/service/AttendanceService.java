@@ -43,6 +43,12 @@ public class AttendanceService {
 
     @Transactional
     public ApiDtos.AttendanceTriggerResponse triggerAttendanceScan(String mockTemplateOverride) {
+        if (!fingerprintService.supportsLocalMatching()) {
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    fingerprintService.providerName() + " capture works, but offline local matching is not possible through RD service. Use the vendor SDK/DLL integration for attendance matching."
+            );
+        }
         FingerprintCaptureResult capture = mockTemplateOverride == null || mockTemplateOverride.isBlank()
                 ? fingerprintService.captureFingerprint()
                 : new FingerprintCaptureResult(mockTemplateOverride, "OVERRIDE", true);

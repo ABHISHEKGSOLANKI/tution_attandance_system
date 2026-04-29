@@ -4,9 +4,14 @@ import { register } from "../api/auth";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    name: "",
-    studentClass: "CLASS_9",
-    email: ""
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    mobile: "",
+    email: "",
+    admissionId: "",
+    standard: "CLASS_9",
+    photo: null
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -18,9 +23,19 @@ export default function RegisterPage() {
     try {
       const data = await register(form);
       setSuccess(data.message);
-      setForm({ name: "", studentClass: "CLASS_9", email: "" });
+      setForm({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        mobile: "",
+        email: "",
+        admissionId: "",
+        standard: "CLASS_9",
+        photo: null
+      });
+      event.target.reset();
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
+      setError(err.response?.data?.error || err.response?.data?.detail || "Registration failed");
     }
   }
 
@@ -29,25 +44,48 @@ export default function RegisterPage() {
       <section className="hero-panel accent">
         <p className="eyebrow">Student onboarding</p>
         <h1>Submit your registration request and wait for admin approval.</h1>
-        <p>The admin will review your request, send your first login credentials by email, and then you will set your own password.</p>
+        <p>
+          Share your admission details and photo. After approval, the system creates your username in the format
+          <strong> firstname_admissionId</strong> and emails your temporary password.
+        </p>
       </section>
 
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Register</h2>
         <label>
-          Full Name
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          First Name
+          <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
         </label>
         <label>
-          Class
-          <select value={form.studentClass} onChange={(e) => setForm({ ...form, studentClass: e.target.value })}>
+          Middle Name
+          <input value={form.middleName} onChange={(e) => setForm({ ...form, middleName: e.target.value })} />
+        </label>
+        <label>
+          Last Name
+          <input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
+        </label>
+        <label>
+          Mobile
+          <input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} required />
+        </label>
+        <label>
+          Email
+          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+        </label>
+        <label>
+          Admission ID
+          <input value={form.admissionId} onChange={(e) => setForm({ ...form, admissionId: e.target.value })} required />
+        </label>
+        <label>
+          Standard
+          <select value={form.standard} onChange={(e) => setForm({ ...form, standard: e.target.value })}>
             <option value="CLASS_9">9th</option>
             <option value="CLASS_10">10th</option>
           </select>
         </label>
         <label>
-          Email
-          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          Photo
+          <input type="file" accept="image/*" onChange={(e) => setForm({ ...form, photo: e.target.files?.[0] || null })} required />
         </label>
         {error && <p className="error-text">{error}</p>}
         {success && <p className="helper-text">{success}</p>}

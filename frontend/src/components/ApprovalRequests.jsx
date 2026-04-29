@@ -68,24 +68,34 @@ export default function ApprovalRequests() {
         ) : (
           <div className="request-list">
             {requests.map((request) => (
-              <div className="request-row card-row" key={request.id}>
+            <div className="request-row card-row" key={request.id}>
+
+              <div className="request-left">
+                <img
+                  src={`http://localhost:8082${request.photoUrl.replace(/\\/g, "/")}`}
+                  alt="student"
+                  className="student-photo"
+                />
+
                 <div>
-                  <strong>{request.name}</strong>
-                  <p>{request.email}</p>
+                  <strong>{request.admissionId} - {request.fullName || `${request.firstName} ${request.lastName}`}</strong>
+                  <p>{request.email} | {request.mobile}</p>
                   <span className="meta-line">
-                    Class: {request.studentClass === "CLASS_9" ? "9th" : "10th"} | Status: Pending
+                    Class: {request.standard === "CLASS_9" ? "9th" : "10th"} | Status: {request.status}
                   </span>
                 </div>
-
-                <div className="inline-actions">
-                  <button type="button" onClick={() => handleApprove(request.id)} disabled={busyId === request.id}>
-                    {busyId === request.id ? "Processing..." : "Approve"}
-                  </button>
-                  <button className="ghost-button" type="button" onClick={() => handleReject(request.id)} disabled={busyId === request.id}>
-                    Reject
-                  </button>
-                </div>
               </div>
+
+              <div className="inline-actions">
+                <button onClick={() => handleApprove(request.id)} disabled={busyId === request.id}>
+                  {busyId === request.id ? "Processing..." : "Approve"}
+                </button>
+                <button className="ghost-button" onClick={() => handleReject(request.id)} disabled={busyId === request.id}>
+                  Reject
+                </button>
+              </div>
+
+            </div>
             ))}
           </div>
         )}

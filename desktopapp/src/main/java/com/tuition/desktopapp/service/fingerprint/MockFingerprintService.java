@@ -8,11 +8,11 @@ import java.security.MessageDigest;
 import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnProperty(prefix = "middleware.fingerprint", name = "sdk-enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnMissingBean(FingerprintService.class)
 public class MockFingerprintService implements FingerprintService {
 
     private static final Logger log = LoggerFactory.getLogger(MockFingerprintService.class);
@@ -47,6 +47,11 @@ public class MockFingerprintService implements FingerprintService {
         int threshold = appProperties.getFingerprint().getMatchingThreshold();
         boolean thresholdMatch = matched || score >= threshold;
         return new FingerprintMatchResult(thresholdMatch, score);
+    }
+
+    @Override
+    public String providerName() {
+        return "Mock fingerprint provider";
     }
 
     private int levenshteinDistance(String left, String right) {
