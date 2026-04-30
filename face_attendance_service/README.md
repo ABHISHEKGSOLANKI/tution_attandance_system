@@ -70,6 +70,29 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Profiles
+
+The face service supports four profiles through root env files:
+
+- `.env.dev`
+- `.env.qa`
+- `.env.staging`
+- `.env.prod`
+
+Set the profile with:
+
+```bash
+set FACE_APP_PROFILE=dev
+```
+
+or in PowerShell:
+
+```powershell
+$env:FACE_APP_PROFILE="dev"
+```
+
+Replace `dev` with `qa`, `staging`, or `prod` as needed.
+
 ## Run The Desktop App
 
 ```bash
@@ -106,12 +129,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8095
 4. On match, it calls the Java backend and stops scanning.
 
 ## API Endpoints
-
-### Browser UI
-
-Open:
-
-- `http://localhost:8095/ui`
 
 ### Register Face
 
