@@ -1,0 +1,16 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://database-1.c3kqoeoogdy7.ap-south-2.rds.amazonaws.com:3306/tuition_attendance_qa?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:3br15EE003}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+
+logging:
+  level:
+    com.tuition.attendance: INFO
+
+app:
+  profile-name: qa

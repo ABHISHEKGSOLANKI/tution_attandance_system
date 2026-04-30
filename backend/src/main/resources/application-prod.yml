@@ -1,0 +1,20 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://database-1.c3kqoeoogdy7.ap-south-2.rds.amazonaws.com:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:3br15EE003}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    com.tuition.attendance: WARN
+
+app:
+  profile-name: prod
