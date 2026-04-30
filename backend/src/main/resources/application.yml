@@ -31,7 +31,7 @@ app:
     expiration-seconds: ${JWT_EXPIRATION_SECONDS:600}
   cors:
     allowed-origins:
-      - ${FRONTEND_ORIGIN:http://localhost:5173}
+      - ${FRONTEND_ORIGIN:http://16.112.140.140/tutionattendancesystem}
       - ${FACE_SERVICE_ORIGIN:http://localhost:8095}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}

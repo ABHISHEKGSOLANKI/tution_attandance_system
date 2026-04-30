@@ -14,3 +14,7 @@ logging:
 
 app:
   profile-name: staging
+  cors:
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://16.112.140.140/tutionattendancesystem}
+      - ${FACE_SERVICE_ORIGIN:http://localhost:8097}
