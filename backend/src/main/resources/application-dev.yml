@@ -14,3 +14,7 @@ logging:
 
 app:
   profile-name: dev
+  cors:
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://localhost:5173}
+      - ${FACE_SERVICE_ORIGIN:http://localhost:8095}

@@ -53,9 +53,7 @@ public class RegistrationService {
         if (registration.getStatus() != RequestStatus.PENDING) {
             throw new ApiException(HttpStatus.CONFLICT, "Registration request is already processed");
         }
-        if (userRepository.existsByEmailIgnoreCase(registration.getEmail())) {
-            throw new ApiException(HttpStatus.CONFLICT, "A user with this email already exists");
-        }
+
         if (userRepository.existsByAdmissionIdIgnoreCase(registration.getAdmissionId())) {
             throw new ApiException(HttpStatus.CONFLICT, "A user with this admission ID already exists");
         }

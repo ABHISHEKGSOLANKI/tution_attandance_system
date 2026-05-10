@@ -33,7 +33,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private StudentClass studentClass;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = true)

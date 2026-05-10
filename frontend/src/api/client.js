@@ -2,7 +2,7 @@ import axios from "axios";
 import { clearStoredAuth, getStoredAuth } from "./session";
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8082"
+  baseURL: import.meta.env.VITE_API_BASE_URL+import.meta.env.VITE_BASE_NAME || "http://localhost:8082"
 });
 
 client.interceptors.request.use((config) => {

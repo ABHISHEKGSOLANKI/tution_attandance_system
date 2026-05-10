@@ -268,9 +268,14 @@ select {
 .camera-frame {
   position: relative;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 16px;
   background: #09111c;
-  min-height: 340px;
+
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 3;   /* clean camera ratio */
+
+  margin: 0 auto;
 }
 
 .camera-frame video {

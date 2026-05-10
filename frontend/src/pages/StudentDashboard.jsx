@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
-import Layout from "../components/Layout";
+import StudentLayout from "../components/StudentLayout";
 
 export default function StudentDashboard() {
   const [dashboard, setDashboard] = useState(null);
@@ -29,7 +29,7 @@ export default function StudentDashboard() {
   }
 
   return (
-    <Layout title="Student Dashboard" subtitle="Review your attendance history and mark today's attendance with a valid fingerprint ID.">
+    <StudentLayout title="Student Dashboard" subtitle="Review your attendance history and mark today's attendance with a valid fingerprint ID.">
       {dashboard && (
         <div className="dashboard-grid">
           <section className="panel stat-panel">
@@ -78,6 +78,6 @@ export default function StudentDashboard() {
           </section>
         </div>
       )}
-    </Layout>
+    </StudentLayout>
   );
 }

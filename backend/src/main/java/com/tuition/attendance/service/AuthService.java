@@ -37,9 +37,7 @@ public class AuthService {
     public AuthDtos.RegistrationResponse registerStudent(RegistrationRequestDTO request) {
         String email = request.getEmail().trim().toLowerCase();
         String admissionId = request.getAdmissionId().trim();
-        if (userRepository.existsByEmailIgnoreCase(email) || pendingRegistrationRepository.existsByEmailIgnoreCase(email)) {
-            throw new ApiException(HttpStatus.CONFLICT, "Email already submitted");
-        }
+
         if (userRepository.existsByAdmissionIdIgnoreCase(admissionId) || pendingRegistrationRepository.existsByAdmissionIdIgnoreCase(admissionId)) {
             throw new ApiException(HttpStatus.CONFLICT, "Admission ID already submitted");
         }
