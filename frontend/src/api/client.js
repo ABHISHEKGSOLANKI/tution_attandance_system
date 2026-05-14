@@ -4,8 +4,9 @@ import { clearStoredAuth, getStoredAuth } from "./session";
 export const appContext = import.meta.env.VITE_CONTEXT_PATH?.trim().replace(/\/+$/, "") || "";
 export const backendBase =  import.meta.env.VITE_BACKEND_API_BASE_URL?.trim().replace(/\/+$/, "") || "";
 export const backendUrl = `${backendBase}${appContext}`;
-export const loginPath = `${backendUrl}/login`;
 export const frontendPath = import.meta.env.VITE_FRONTEND_PATH;
+export const loginPath = `${frontendPath}/login`;
+
 
 const client = axios.create({
   baseURL: backendUrl,
@@ -22,10 +23,17 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || "";
+
+    // Ignore login API failures
+    if (
+      error.response?.status === 401 &&
+      !requestUrl.includes("/auth/login")
+    ) {
       clearStoredAuth();
-      window.location.assign(loginPath);
+      window.location.assign(frontendPath + "login");
     }
+
     return Promise.reject(error);
   }
 );

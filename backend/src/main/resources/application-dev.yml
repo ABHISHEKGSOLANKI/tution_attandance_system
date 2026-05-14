@@ -1,7 +1,7 @@
 server:
   port: ${SERVER_PORT:8082}
   servlet:
-    context-path: /tutionattendancesystemdev
+    context-path: /tutionattendancesystemdev/api
 
 spring:
   datasource:
