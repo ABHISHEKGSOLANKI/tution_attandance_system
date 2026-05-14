@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { approveRegistration, getPendingRegistrations, rejectRegistration } from "../api/admin";
 import Modal from "./Modal";
+import { backendUrl } from "../api/client";
 
 export default function ApprovalRequests() {
   const [requests, setRequests] = useState([]);
@@ -72,7 +73,7 @@ export default function ApprovalRequests() {
 
               <div className="request-left">
                 <img
-                  src={request.photoUrl ? `${window.location.origin}${request.photoUrl.replace(/\\/g, "/")}` : ""}
+                  src={request.photoUrl ? `${backendUrl}${request.photoUrl.replace(/\\/g, "/")}` : ""}
                   alt="student"
                   className="student-photo"
                 />

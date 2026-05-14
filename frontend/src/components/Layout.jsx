@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { clearStoredAuth, getStoredAuth } from "../api/session";
-import { appContext } from "../api/client";
+import { frontendPath } from "../api/client";
 
 export default function Layout({ title, subtitle, children }) {
   const auth = getStoredAuth();
@@ -9,7 +9,7 @@ export default function Layout({ title, subtitle, children }) {
 
   function handleLogout() {
     clearStoredAuth();
-    window.location.href = appContext + "/login";
+    window.location.href = frontendPath + "login";
   }
 
   return (
