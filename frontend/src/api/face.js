@@ -1,7 +1,8 @@
 import axios from "axios";
+import { backendUrl } from "./client";
 
 const faceClient = axios.create({
-  baseURL: import.meta.env.VITE_FACE_API_BASE_URL || "http://localhost:8095"
+  baseURL: import.meta.env.VITE_FACE_API_BASE_URL?.trim() || `${backendUrl}/faceapi`
 });
 
 export async function registerFaceSamples(payload) {

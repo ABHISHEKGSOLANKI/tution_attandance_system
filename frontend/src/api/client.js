@@ -1,8 +1,13 @@
 import axios from "axios";
 import { clearStoredAuth, getStoredAuth } from "./session";
 
+export const appContext = import.meta.env.VITE_CONTEXT_PATH?.trim().replace(/\/+$/, "") || "";
+export const backendBase =  import.meta.env.VITE_BACKEND_API_BASE_URL?.trim().replace(/\/+$/, "") || "";
+export const backendUrl = `${backendBase}${appContext}`;
+export const loginPath = `${backendUrl}/login`;
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL+import.meta.env.VITE_BASE_NAME || "http://localhost:8082"
+  baseURL: backendUrl,
 });
 
 client.interceptors.request.use((config) => {
@@ -18,7 +23,7 @@ client.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       clearStoredAuth();
-      window.location.href = "/login";
+      window.location.assign(loginPath);
     }
     return Promise.reject(error);
   }

@@ -15,7 +15,7 @@ class Settings:
     comparison_tolerance = get_float("FACE_COMPARISON_TOLERANCE", 0.5)
     preview_window_name = get_setting("FACE_PREVIEW_WINDOW_NAME", "Face Attendance Preview")
     preview_enabled = get_bool("FACE_PREVIEW_ENABLED", True)
-    backend_attendance_url = get_setting("FACE_BACKEND_ATTENDANCE_URL", "http://localhost:8082/admin/attendance/face-mark")
+    backend_attendance_url = get_setting("FACE_BACKEND_ATTENDANCE_URL", "http://127.0.0.1:8085/api/admin/attendance/face-mark")
     backend_timeout_seconds = get_int("FACE_BACKEND_TIMEOUT_SECONDS", 10)
 
 

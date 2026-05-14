@@ -18,7 +18,7 @@ class DesktopSettings:
     scan_frame_delay_seconds = get_float("FACE_SCAN_FRAME_DELAY_SECONDS", 0.2)
     preview_width = get_int("FACE_PREVIEW_WIDTH", 700)
     preview_height = get_int("FACE_PREVIEW_HEIGHT", 420)
-    backend_attendance_url = get_setting("FACE_BACKEND_ATTENDANCE_URL", "http://localhost:8082/admin/attendance/face-mark")
+    backend_attendance_url = get_setting("FACE_BACKEND_ATTENDANCE_URL", "http://127.0.0.1:8085/api/admin/attendance/face-mark")
     backend_timeout_seconds = get_int("FACE_BACKEND_TIMEOUT_SECONDS", 10)
     preview_poll_ms = get_int("FACE_PREVIEW_POLL_MS", 40)
 

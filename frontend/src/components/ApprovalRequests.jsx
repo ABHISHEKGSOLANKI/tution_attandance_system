@@ -72,7 +72,7 @@ export default function ApprovalRequests() {
 
               <div className="request-left">
                 <img
-                  src={`http://localhost:8082${request.photoUrl.replace(/\\/g, "/")}`}
+                  src={request.photoUrl ? `${window.location.origin}${request.photoUrl.replace(/\\/g, "/")}` : ""}
                   alt="student"
                   className="student-photo"
                 />

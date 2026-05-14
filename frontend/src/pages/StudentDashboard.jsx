@@ -19,7 +19,7 @@ export default function StudentDashboard() {
   async function handleScan(event) {
     event.preventDefault();
     try {
-      const response = await client.post("/attendance/scan", { fingerprintId: scanFingerprintId });
+      const response = await client.post("/admin/attendance/mark", { fingerprintId: scanFingerprintId });
       setMessage(response.data.message);
       setScanFingerprintId("");
       loadDashboard();

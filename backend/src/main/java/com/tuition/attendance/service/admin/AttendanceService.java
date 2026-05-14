@@ -20,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -68,16 +70,25 @@ public class AttendanceService {
     public AttendanceDtos.AttendanceMarkResponse markAttendanceByFace(AttendanceDtos.FaceAttendanceMarkRequest request) {
         User student = resolveStudentForFaceAttendance(request.studentId());
         if (student.getRole() != Role.STUDENT) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Only students can mark attendance");
+            return new AttendanceDtos.AttendanceMarkResponse("Only students can mark attendance", null);
         }
         if (!student.isApproved()) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Student is not approved for attendance yet");
+            return new AttendanceDtos.AttendanceMarkResponse("Student is not approved for attendance yet", null);
         }
 
         LocalDate attendanceDate = request.timestamp().toLocalDate();
-        attendanceRepository.findByStudentIdAndAttendanceDate(student.getId(), attendanceDate).ifPresent(existing -> {
-            throw new ApiException(HttpStatus.CONFLICT, "Attendance already marked for today");
-        });
+
+        Optional<AttendanceRecord> existingAttendance =
+                attendanceRepository.findByStudentIdAndAttendanceDate(
+                        student.getId(),
+                        attendanceDate
+                );
+
+        if (existingAttendance.isPresent()) {
+            return new AttendanceDtos.AttendanceMarkResponse("Attendance already marked for today",
+                    Mapper.toAttendanceView(existingAttendance.get())
+            );
+        }
 
         AttendanceRecord record = new AttendanceRecord();
         record.setStudent(student);

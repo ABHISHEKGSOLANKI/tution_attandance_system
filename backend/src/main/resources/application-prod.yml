@@ -1,9 +1,10 @@
 server:
   port: ${SERVER_PORT:8085}
-
+  servlet:
+    context-path: /tutionattendancesystem
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://database-1.c3kqoeoogdy7.ap-south-2.rds.amazonaws.com:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     username: ${DB_USERNAME:admin}
     password: ${DB_PASSWORD:3br15EE003}
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
@@ -20,5 +21,5 @@ app:
   profile-name: prod
   cors:
     allowed-origins:
-      - ${FRONTEND_ORIGIN:http://16.112.140.140/tutionattendancesystem}
-      - ${FACE_SERVICE_ORIGIN:http://localhost:8098}
+      - ${FRONTEND_ORIGIN:http://35.154.0.23}
+      - ${FACE_SERVICE_ORIGIN:http://35.154.0.23}
