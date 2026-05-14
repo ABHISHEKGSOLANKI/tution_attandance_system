@@ -21,5 +21,5 @@ app:
   profile-name: prod
   cors:
     allowed-origins:
-      - ${FRONTEND_ORIGIN:http://35.154.0.23}
-      - ${FACE_SERVICE_ORIGIN:http://35.154.0.23}
+      - ${FRONTEND_ORIGIN:https://nirmaanyantra.com}
+      - ${FACE_SERVICE_ORIGIN:https://nirmaanyantra.com}
