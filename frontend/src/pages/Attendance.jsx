@@ -3,29 +3,62 @@ import { captureAttendanceFrame } from "../api/face";
 import Layout from "../components/Layout";
 import Modal from "../components/Modal";
 
+const SCAN_INTERVAL_MS = 1800;
+const MATCH_COOLDOWN_MS = 15000;
+const ERROR_ANNOUNCEMENT_COOLDOWN_MS = 5000;
+
 export default function Attendance() {
-  const [status, setStatus] = useState("Ready to start attendance scanning.");
+  const [status, setStatus] = useState("Start attendance to open the camera and begin continuous face scanning.");
   const [result, setResult] = useState(null);
-  const [busy, setBusy] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [modal, setModal] = useState({ open: false, tone: "success", title: "", message: "" });
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const loopTimeoutRef = useRef(null);
+  const scanningRef = useRef(false);
+  const inFlightRef = useRef(false);
+  const announcedStudentsRef = useRef(new Map());
+  const lastErrorAnnouncementRef = useRef(0);
 
   useEffect(() => {
-    startCamera();
-    return () => stopCamera();
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        stopAttendance("Attendance paused because the browser tab is no longer active.");
+      }
+    }
+
+    function handleWindowBlur() {
+      stopAttendance("Attendance paused because the browser window lost focus.");
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      stopAttendance();
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
   async function startCamera() {
+    if (streamRef.current) {
+      return true;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-      setStatus("Camera ready. Keep one face visible, then start attendance.");
+      setCameraActive(true);
+      setStatus("Camera ready. Attendance scanning is active. Keep one face visible.");
+      return true;
     } catch (error) {
       setModal({
         open: true,
@@ -33,10 +66,16 @@ export default function Attendance() {
         title: "Camera unavailable",
         message: "Please allow browser camera access and make sure a webcam is connected."
       });
+      setStatus("Unable to start the camera.");
+      return false;
     }
   }
 
-  function stopCamera() {
+  function stopCamera(resetStatus = true) {
+    if (loopTimeoutRef.current) {
+      window.clearTimeout(loopTimeoutRef.current);
+      loopTimeoutRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -44,11 +83,21 @@ export default function Attendance() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    setCameraActive(false);
+    setIsScanning(false);
+    scanningRef.current = false;
+    inFlightRef.current = false;
+    if (resetStatus) {
+      setStatus("Attendance stopped. Start attendance to resume scanning.");
+    }
   }
 
   function captureFrame() {
     const canvas = canvasRef.current;
     const video = videoRef.current;
+    if (!canvas || !video || !video.videoWidth || !video.videoHeight) {
+      return null;
+    }
     const context = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -56,29 +105,126 @@ export default function Attendance() {
     return canvas.toDataURL("image/jpeg", 0.92);
   }
 
-  async function handleAttendance() {
+  function speak(message) {
+    if (!("speechSynthesis" in window) || !message) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function scheduleNextScan() {
+    if (!scanningRef.current) {
+      return;
+    }
+
+    loopTimeoutRef.current = window.setTimeout(() => {
+      scanFrame();
+    }, SCAN_INTERVAL_MS);
+  }
+
+  function shouldAnnounceStudent(studentId) {
+    const now = Date.now();
+    const lastSeen = announcedStudentsRef.current.get(studentId) || 0;
+    if (now - lastSeen < MATCH_COOLDOWN_MS) {
+      return false;
+    }
+
+    announcedStudentsRef.current.set(studentId, now);
+    return true;
+  }
+
+  function announceError() {
+    const now = Date.now();
+    if (now - lastErrorAnnouncementRef.current < ERROR_ANNOUNCEMENT_COOLDOWN_MS) {
+      return;
+    }
+
+    lastErrorAnnouncementRef.current = now;
+    speak("Error while taking attendance");
+  }
+
+  async function scanFrame() {
+    if (!scanningRef.current || inFlightRef.current) {
+      return;
+    }
+
+    const image = captureFrame();
+    if (!image) {
+      scheduleNextScan();
+      return;
+    }
+
     try {
-      setBusy(true);
-      setStatus("Scanning face and matching attendance...");
-      const response = await captureAttendanceFrame({ image: captureFrame() });
+      inFlightRef.current = true;
+      const response = await captureAttendanceFrame({ image });
       setResult(response);
-      setStatus(response.message || "Attendance completed.");
-      setModal({
-        open: true,
-        tone: response.matched ? "success" : "warning",
-        title: response.matched ? "Attendance result" : "Face not recognized",
-        message: response.message || "Attendance completed."
-      });
+
+      if (response.matched && response.studentId) {
+        setStatus(response.message || `${response.studentId} present`);
+        if (shouldAnnounceStudent(response.studentId)) {
+          speak(`${response.studentId} present`);
+        }
+      } else {
+        setStatus("Face not recognized. Keep one face centered and try again.");
+      }
     } catch (error) {
-      setModal({
-        open: true,
-        tone: "error",
-        title: "Attendance failed",
-        message: error.response?.data?.detail || "Could not complete attendance capture."
-      });
-      setStatus("Attendance failed.");
+      const detail = error.response?.data?.detail || "Could not complete attendance capture.";
+
+      if (detail === "No face detected in frame") {
+        setStatus("No face detected. Keep one face centered in the frame.");
+      } else if (detail === "Multiple faces detected in frame") {
+        setStatus("Multiple faces detected. Please keep only one face in the frame.");
+      } else {
+        setStatus("Attendance failed.");
+        announceError();
+        setModal({
+          open: true,
+          tone: "error",
+          title: "Attendance failed",
+          message: detail
+        });
+      }
     } finally {
-      setBusy(false);
+      inFlightRef.current = false;
+      scheduleNextScan();
+    }
+  }
+
+  function stopAttendance(nextStatus) {
+    stopCamera(false);
+    if (nextStatus) {
+      setStatus(nextStatus);
+    } else {
+      setStatus("Attendance stopped. Start attendance to resume scanning.");
+    }
+  }
+
+  async function handleAttendance() {
+    if (isScanning) {
+      stopAttendance();
+      return;
+    }
+
+    try {
+      const started = await startCamera();
+      if (!started) {
+        return;
+      }
+
+      setStatus("Attendance scanning started. Keep one face visible.");
+      scanningRef.current = true;
+      setIsScanning(true);
+      setResult(null);
+      loopTimeoutRef.current = window.setTimeout(() => {
+        scanFrame();
+      }, 250);
+    } catch (error) {
+      setStatus("Attendance failed to start.");
     }
   }
 
@@ -94,13 +240,15 @@ export default function Attendance() {
 
         <div className="camera-frame large-frame">
           <video ref={videoRef} autoPlay playsInline muted />
-          <div className="camera-overlay">Keep one face centered</div>
+          <div className="camera-overlay">
+            {cameraActive ? "Keep one face centered" : "Camera is off"}
+          </div>
         </div>
         <canvas ref={canvasRef} style={{ display: "none" }} />
 
         <div className="action-row">
-          <button type="button" onClick={handleAttendance} disabled={busy}>
-            {busy ? "Scanning..." : "Start Attendance"}
+          <button type="button" onClick={handleAttendance}>
+            {isScanning ? "Stop Attendance" : "Start Attendance"}
           </button>
         </div>
 

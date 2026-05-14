@@ -5,40 +5,68 @@ import Modal from "./Modal";
 export default function FaceRegistration( { activeTab } ) {
   const [studentId, setStudentId] = useState("");
   const [samples, setSamples] = useState([]);
-  const [status, setStatus] = useState("Start the camera, then capture 3 to 5 clear face samples.");
+  const [status, setStatus] = useState("Start capture to open the camera, then collect 3 to 5 clear face samples.");
   const [busy, setBusy] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const [modal, setModal] = useState({ open: false, tone: "success", title: "", message: "" });
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
-useEffect(() => {
-  if (activeTab === "face") {
-    startCamera();
-  } else {
-    stopCamera();
-  }
-}, [activeTab]);
+  useEffect(() => {
+    if (activeTab !== "face") {
+      stopCamera();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        stopCamera("Camera stopped because the browser tab is no longer active.");
+      }
+    }
+
+    function handleWindowBlur() {
+      stopCamera("Camera stopped because the browser window lost focus.");
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      stopCamera();
+    };
+  }, []);
 
   function openModal(tone, title, message) {
     setModal({ open: true, tone, title, message });
   }
 
   async function startCamera() {
+    if (streamRef.current) {
+      return true;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+      setCameraActive(true);
       setStatus("Camera ready. Capture 3 to 5 samples.");
+      return true;
     } catch (error) {
       openModal("error", "Camera unavailable", "Please allow camera access and make sure a webcam is connected.");
+      setStatus("Unable to start the camera.");
+      return false;
     }
   }
 
-  function stopCamera() {
+  function stopCamera(nextStatus) {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -47,11 +75,19 @@ useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+
+    setCameraActive(false);
+    if (nextStatus) {
+      setStatus(nextStatus);
+    }
   }
 
   function captureFrame() {
     const canvas = canvasRef.current;
     const video = videoRef.current;
+    if (!canvas || !video || !video.videoWidth || !video.videoHeight) {
+      return null;
+    }
     const context = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -59,13 +95,23 @@ useEffect(() => {
     return canvas.toDataURL("image/jpeg", 0.92);
   }
 
-  function handleCapture() {
+  async function handleCapture() {
+    if (!cameraActive) {
+      await startCamera();
+      return;
+    }
+
     if (samples.length >= 5) {
       setStatus("You already captured the maximum 5 samples.");
       return;
     }
 
     const image = captureFrame();
+    if (!image) {
+      setStatus("Camera is still warming up. Please try capturing again.");
+      return;
+    }
+
     setSamples((current) => [...current, image]);
     setStatus(`Captured sample ${samples.length + 1}/5.`);
   }
@@ -108,7 +154,9 @@ useEffect(() => {
 
         <div className="camera-frame">
           <video ref={videoRef} autoPlay playsInline muted />
-          <div className="camera-overlay">Align one face inside the frame</div>
+          <div className="camera-overlay">
+            {cameraActive ? "Align one face inside the frame" : "Camera is off"}
+          </div>
         </div>
 
         <canvas ref={canvasRef} style={{ display: "none" }} />
@@ -127,7 +175,7 @@ useEffect(() => {
 
         <div className="action-row">
           <button className="secondary-button" type="button" onClick={handleCapture}>
-            Start Face Capture
+            {cameraActive ? "Capture Sample" : "Start Capture"}
           </button>
           <button type="button" onClick={handleRegister} disabled={busy}>
             {busy ? "Registering..." : "Register"}
@@ -135,6 +183,11 @@ useEffect(() => {
           <button className="ghost-button" type="button" onClick={handleClear}>
             Clear
           </button>
+          {cameraActive && (
+            <button className="ghost-button" type="button" onClick={() => stopCamera("Camera stopped.")}>
+              Stop Camera
+            </button>
+          )}
         </div>
 
         <div className="status-banner">{status}</div>

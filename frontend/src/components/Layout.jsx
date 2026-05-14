@@ -16,15 +16,27 @@ export default function Layout({ title, subtitle, children }) {
     <div className="app-shell">
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="brand-block">
-          <p className="brand-kicker">Tuition Center</p>
+          <p className="brand-kicker">{collapsed ? "TC" : "Tuition Center"}</p>
           <h2 className="logo">{collapsed ? "GT" : "Gangadhar Tutions"}</h2>
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/registration">Registration</NavLink>
-          <NavLink to="/attendance">Attendance</NavLink>
-          <NavLink to="/reports">Reports</NavLink>
+          <NavLink to="/dashboard" title="Dashboard" aria-label="Dashboard">
+            <span className="nav-badge">D</span>
+            <span className="nav-label">Dashboard</span>
+          </NavLink>
+          <NavLink to="/registration" title="Registration" aria-label="Registration">
+            <span className="nav-badge">R</span>
+            <span className="nav-label">Registration</span>
+          </NavLink>
+          <NavLink to="/attendance" title="Attendance" aria-label="Attendance">
+            <span className="nav-badge">A</span>
+            <span className="nav-label">Attendance</span>
+          </NavLink>
+          <NavLink to="/reports" title="Reports" aria-label="Reports">
+            <span className="nav-badge">P</span>
+            <span className="nav-label">Reports</span>
+          </NavLink>
         </nav>
       </aside>
 
