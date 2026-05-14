@@ -39,7 +39,7 @@ public class AuthService {
         String admissionId = request.getAdmissionId().trim();
 
         if (userRepository.existsByAdmissionIdIgnoreCase(admissionId) || pendingRegistrationRepository.existsByAdmissionIdIgnoreCase(admissionId)) {
-            throw new ApiException(HttpStatus.CONFLICT, "Admission ID already submitted");
+            return new AuthDtos.RegistrationResponse("Admission ID already submitted");
         }
 
         PendingRegistration registration = new PendingRegistration();
@@ -47,6 +47,7 @@ public class AuthService {
         registration.setMiddleName(request.getMiddleName() == null ? null : request.getMiddleName().trim());
         registration.setLastName(request.getLastName().trim());
         registration.setMobile(request.getMobile().trim());
+        registration.setCountryCode(request.getCountryCode().trim());
         registration.setEmail(email);
         registration.setAdmissionId(admissionId);
         registration.setStandard(request.getStandard());

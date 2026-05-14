@@ -51,11 +51,11 @@ public class RegistrationService {
         PendingRegistration registration = pendingRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Pending registration not found"));
         if (registration.getStatus() != RequestStatus.PENDING) {
-            throw new ApiException(HttpStatus.CONFLICT, "Registration request is already processed");
+            return new ApprovalResponseDTO("Registration request is already processed");
         }
 
         if (userRepository.existsByAdmissionIdIgnoreCase(registration.getAdmissionId())) {
-            throw new ApiException(HttpStatus.CONFLICT, "A user with this admission ID already exists");
+            return new ApprovalResponseDTO("A user with this admission ID already exists");
         }
 
         String username = generateUniqueUsername(registration.getFirstName(), registration.getAdmissionId());
@@ -68,6 +68,7 @@ public class RegistrationService {
         user.setMiddleName(registration.getMiddleName());
         user.setLastName(registration.getLastName());
         user.setMobile(registration.getMobile());
+        user.setCountryCode(registration.getCountryCode());
         user.setEmail(registration.getEmail());
         user.setAdmissionId(registration.getAdmissionId());
         user.setPhotoUrl(registration.getPhotoUrl());
@@ -92,7 +93,7 @@ public class RegistrationService {
         PendingRegistration registration = pendingRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Pending registration not found"));
         if (registration.getStatus() != RequestStatus.PENDING) {
-            throw new ApiException(HttpStatus.CONFLICT, "Registration request is already processed");
+            new ApprovalResponseDTO("Registration request is already processed");
         }
 
         registration.setStatus(RequestStatus.REJECTED);

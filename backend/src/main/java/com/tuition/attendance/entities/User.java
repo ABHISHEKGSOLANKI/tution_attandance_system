@@ -55,6 +55,9 @@ public class User {
     private String mobile;
 
     @Column(nullable = false)
+    private String countryCode;
+
+    @Column(nullable = false)
     private String firstName;
 
     @Column
@@ -103,4 +106,12 @@ public class User {
     public void setAdmissionId(String admissionId) { this.admissionId = admissionId; }
     public String getPhotoUrl() { return photoUrl; }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
 }

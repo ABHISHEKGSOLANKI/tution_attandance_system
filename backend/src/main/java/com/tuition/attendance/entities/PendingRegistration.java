@@ -31,6 +31,8 @@ public class PendingRegistration {
 
     @Column(nullable = false)
     private String mobile;
+    @Column(nullable = false)
+    private String countryCode;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -79,4 +81,12 @@ public class PendingRegistration {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getApprovedAt() { return approvedAt; }
     public void setApprovedAt(LocalDateTime approvedAt) { this.approvedAt = approvedAt; }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
 }
