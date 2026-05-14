@@ -1,7 +1,7 @@
 server:
   port: ${SERVER_PORT:8085}
   servlet:
-    context-path: /tutionattendancesystem
+    context-path: /tutionattendancesystem/api
 spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
