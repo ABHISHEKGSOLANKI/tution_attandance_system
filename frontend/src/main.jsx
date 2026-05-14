@@ -3,9 +3,9 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/app.css";
-import { appContext } from "./api/client";
+import { frontendPath } from "./api/client";
 
-const routerBasename = appContext ? appContext.replace(/\/$/, "") : "undefined";
+const routerBasename = frontendPath ? frontendPath.replace(/\/$/, "") : "undefined";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

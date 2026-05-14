@@ -5,6 +5,7 @@ export const appContext = import.meta.env.VITE_CONTEXT_PATH?.trim().replace(/\/+
 export const backendBase =  import.meta.env.VITE_BACKEND_API_BASE_URL?.trim().replace(/\/+$/, "") || "";
 export const backendUrl = `${backendBase}${appContext}`;
 export const loginPath = `${backendUrl}/login`;
+export const frontendPath = import.meta.env.VITE_FRONTEND_PATH;
 
 const client = axios.create({
   baseURL: backendUrl,
