@@ -15,10 +15,6 @@ export default function Layout({ title, subtitle, children }) {
   return (
     <div className="app-shell">
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-        <div className="brand-block">
-          <p className="brand-kicker">{collapsed ? "TC" : "Tuition Center"}</p>
-          <h2 className="logo">{collapsed ? "GT" : "Gangadhar Tutions"}</h2>
-        </div>
 
         <nav className="sidebar-nav">
           <NavLink to="/dashboard" title="Dashboard" aria-label="Dashboard">

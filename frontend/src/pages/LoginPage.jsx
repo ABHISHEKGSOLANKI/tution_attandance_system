@@ -21,9 +21,9 @@ export default function LoginPage() {
   return (
     <div className="auth-shell">
       <section className="hero-panel">
-        <h1 className="logo">Gangadhar Tutions</h1>
+        <h1 className="logo">Attendance System</h1>
         <p className="eyebrow">Attendance and approval workflow</p>
-        <h1>Track tuition attendance with secure student and admin access.</h1>
+        <h1>Track attendance with secure student and admin access.</h1>
         <p>
           Students first submit their registration request with photo and admission details. After admin approval,
           they receive a generated username and temporary password by email.
