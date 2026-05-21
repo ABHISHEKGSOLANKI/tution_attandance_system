@@ -181,13 +181,13 @@ export default function Attendance() {
         setStatus("Multiple faces detected. Please keep only one face in the frame.");
       } else {
         setStatus("Attendance failed.");
-        announceError();
-        setModal({
-          open: true,
-          tone: "error",
-          title: "Attendance failed",
-          message: detail
-        });
+        // announceError();
+        // setModal({
+        //   open: true,
+        //   tone: "error",
+        //   title: "Attendance failed",
+        //   message: detail
+        // });
       }
     } finally {
       inFlightRef.current = false;
