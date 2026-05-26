@@ -4,12 +4,13 @@ from profile_config import get_bool, get_float, get_int, get_setting
 
 
 class Settings:
+    profile = get_setting("FACE_APP_PROFILE", "dev")
     base_dir = Path(__file__).resolve().parents[2]
-    data_dir = base_dir / "data"
+    data_dir = base_dir / "data" / profile
+    data_dir.mkdir(parents=True, exist_ok=True)
     encodings_file = Path(get_setting("FACE_ENCODINGS_FILE", str(data_dir / "face_encodings.json")))
     sample_file = Path(get_setting("FACE_SAMPLE_FILE", str(data_dir / "sample_face_encodings.json")))
 
-    profile = get_setting("FACE_APP_PROFILE", "dev")
     camera_index = get_int("FACE_CAMERA_INDEX", 0)
     capture_count = get_int("FACE_CAPTURE_COUNT", 5)
     comparison_tolerance = get_float("FACE_COMPARISON_TOLERANCE", 0.5)
