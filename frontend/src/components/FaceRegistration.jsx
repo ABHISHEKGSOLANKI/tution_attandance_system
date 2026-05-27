@@ -143,59 +143,79 @@ export default function FaceRegistration( { activeTab } ) {
 
   return (
     <>
-      <div className="module-card">
-        <div className="module-head">
+      <div className="rounded-[24px] border border-[rgba(201,214,225,0.8)] bg-[rgba(255,255,255,0.78)] p-6 backdrop-blur-[14px]">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h3>Face Registration</h3>
-            <p>Capture multiple clear face samples before saving the student.</p>
+            <h3 className="text-xl font-semibold text-slate-900">Face Registration</h3>
+            <p className="mt-1 text-sm text-slate-600">Capture multiple clear face samples before saving the student.</p>
           </div>
-          <span className="pill">{samples.length}/5 samples</span>
+          <span className="rounded-full bg-[#edf4fb] px-3 py-2 text-sm font-bold text-[#163f69]">{samples.length}/5 samples</span>
         </div>
 
-        <div className="camera-frame">
-          <video ref={videoRef} autoPlay playsInline muted />
-          <div className="camera-overlay">
+        <div className="relative mx-auto aspect-[4/3] w-full max-w-[420px] overflow-hidden rounded-2xl bg-[#09111c]">
+          <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-[rgba(9,17,28,0.62)] px-4 py-2 text-sm text-white">
             {cameraActive ? "Align one face inside the frame" : "Camera is off"}
           </div>
         </div>
 
         <canvas ref={canvasRef} style={{ display: "none" }} />
 
-        <div className="field-grid">
-          <label>
+        <div className="mt-5 grid gap-3">
+          <label className="grid gap-2 text-sm font-semibold text-slate-700">
             <span>Student ID</span>
             <input
               type="text"
               placeholder="Enter user ID, username, or admission ID"
               value={studentId}
               onChange={(event) => setStudentId(event.target.value)}
+              className="w-full rounded-2xl border border-slate-300 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-200"
             />
           </label>
         </div>
 
-        <div className="action-row">
-          <button className="secondary-button" type="button" onClick={handleCapture}>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            className="rounded-2xl border border-[rgba(22,63,105,0.18)] bg-transparent px-5 py-3 text-sm font-semibold text-[#163f69] transition hover:-translate-y-px"
+            type="button"
+            onClick={handleCapture}
+          >
             {cameraActive ? "Capture Sample" : "Start Capture"}
           </button>
-          <button type="button" onClick={handleRegister} disabled={busy}>
+          <button
+            className="rounded-2xl bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-px hover:bg-slate-700 disabled:opacity-60"
+            type="button"
+            onClick={handleRegister}
+            disabled={busy}
+          >
             {busy ? "Registering..." : "Register"}
           </button>
-          <button className="ghost-button" type="button" onClick={handleClear}>
+          <button
+            className="rounded-2xl border border-[rgba(22,63,105,0.18)] bg-transparent px-5 py-3 text-sm font-semibold text-[#163f69] transition hover:-translate-y-px"
+            type="button"
+            onClick={handleClear}
+          >
             Clear
           </button>
           {cameraActive && (
-            <button className="ghost-button" type="button" onClick={() => stopCamera("Camera stopped.")}>
+            <button
+              className="rounded-2xl border border-[rgba(22,63,105,0.18)] bg-transparent px-5 py-3 text-sm font-semibold text-[#163f69] transition hover:-translate-y-px"
+              type="button"
+              onClick={() => stopCamera("Camera stopped.")}
+            >
               Stop Camera
             </button>
           )}
         </div>
 
-        <div className="status-banner">{status}</div>
-        <p className="helper-text">Use the approved student's database ID, username, or admission ID so attendance can be written back to the backend.</p>
+        <div className="mt-5 rounded-2xl bg-[#eff5fb] px-4 py-4 text-sm text-slate-600">{status}</div>
+        <p className="mt-3 text-sm text-slate-600">
+          Use the approved student's database ID, username, or admission ID so attendance can be written back to the backend.
+        </p>
 
-        <div className="shot-grid">
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-5">
           {samples.map((image, index) => (
-            <img key={index} src={image} alt={`sample ${index + 1}`} />
+            <img key={index} src={image} alt={`sample ${index + 1}`} className="h-24 w-full rounded-2xl object-cover" />
           ))}
         </div>
       </div>

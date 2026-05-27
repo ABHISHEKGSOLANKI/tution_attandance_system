@@ -230,37 +230,41 @@ export default function Attendance() {
 
   return (
     <Layout title="Attendance" subtitle="Capture a live face and mark attendance through the Python recognition service.">
-      <div className="module-card">
-        <div className="module-head">
+      <div className="rounded-[24px] border border-[rgba(201,214,225,0.8)] bg-[rgba(255,255,255,0.78)] p-6 backdrop-blur-[14px]">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h3>Face Attendance Capture</h3>
-            <p>Use the live camera preview to scan one student at a time.</p>
+            <h3 className="text-xl font-semibold text-slate-900">Face Attendance Capture</h3>
+            <p className="mt-1 text-sm text-slate-600">Use the live camera preview to scan one student at a time.</p>
           </div>
         </div>
 
-        <div className="camera-frame large-frame">
-          <video ref={videoRef} autoPlay playsInline muted />
-          <div className="camera-overlay">
+        <div className="relative mx-auto aspect-[4/3] min-h-[420px] w-full max-w-[420px] overflow-hidden rounded-2xl bg-[#09111c]">
+          <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-[rgba(9,17,28,0.62)] px-4 py-2 text-sm text-white">
             {cameraActive ? "Keep one face centered" : "Camera is off"}
           </div>
         </div>
         <canvas ref={canvasRef} style={{ display: "none" }} />
 
-        <div className="action-row">
-          <button type="button" onClick={handleAttendance}>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            className="rounded-2xl bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-px hover:bg-slate-700"
+            type="button"
+            onClick={handleAttendance}
+          >
             {isScanning ? "Stop Attendance" : "Start Attendance"}
           </button>
         </div>
 
-        <div className="status-banner">{status}</div>
+        <div className="mt-5 rounded-2xl bg-[#eff5fb] px-4 py-4 text-sm text-slate-600">{status}</div>
 
         {result && (
-          <div className="result-card">
-            <h4>Last Result</h4>
-            <p>
+          <div className="mt-5 rounded-2xl bg-[#f7fafc] px-4 py-4">
+            <h4 className="text-base font-semibold text-slate-900">Last Result</h4>
+            <p className="mt-2 text-sm text-slate-600">
               <strong>Student ID:</strong> {result.studentId || "Unknown"}
             </p>
-            <p>
+            <p className="mt-1 text-sm text-slate-600">
               <strong>Message:</strong> {result.message}
             </p>
           </div>
