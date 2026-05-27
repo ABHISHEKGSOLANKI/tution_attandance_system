@@ -1,4 +1,12 @@
+server:
+  port: ${SERVER_PORT:8082}
+
 spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   servlet:
@@ -15,8 +23,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:abhishek.solanki.dev11@gmail.com}
-    password: ${MAIL_PASSWORD:xgmqftpuilgxhyqc}
+    username: ${MAIL_USERNAME:test@gmail.com}
+    password: ${MAIL_PASSWORD:1234567890}
     properties:
       mail:
         smtp:
@@ -27,10 +35,16 @@ spring:
 app:
   timezone: ${APP_TIMEZONE:Asia/Kolkata}
   jwt:
-    secret: ${JWT_SECRET:c3VwZXItc2VjdXJlLWF0dGVuZGFuY2Utand0LXNlY3JldC1rZXktZm9yLWRlbW8=}
+    secret: ${JWT_SECRET:1234567890}
     expiration-seconds: ${JWT_EXPIRATION_SECONDS:600}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
     public-path: /uploads
   attendance-requests:
     auto-approve-cron: ${ATTENDANCE_AUTO_APPROVE_CRON:0 0 1 * * *}
+  app:
+    profile-name: ${ENV:dev}
+    cors:
+      allowed-origins:
+        - ${FRONTEND_ORIGIN:http://localhost:5173}
+        - ${FACE_SERVICE_ORIGIN:http://localhost:8091}

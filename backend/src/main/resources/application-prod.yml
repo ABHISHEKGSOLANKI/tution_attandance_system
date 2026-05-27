@@ -1,13 +1,10 @@
 server:
-  port: ${SERVER_PORT:8085}
   servlet:
-    context-path: /tutionattendancesystem/api
+    context-path: /attendancesystem/api
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${DB_USERNAME:admin}
-    password: ${DB_PASSWORD:3br15EE003}
-    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_prod?createDatabaseIfNotExist=true&serverTimezone=UTC}
+
   jpa:
     properties:
       hibernate:
@@ -16,10 +13,3 @@ spring:
 logging:
   level:
     com.tuition.attendance: WARN
-
-app:
-  profile-name: prod
-  cors:
-    allowed-origins:
-      - ${FRONTEND_ORIGIN:https://nirmaanyantra.com}
-      - ${FACE_SERVICE_ORIGIN:https://nirmaanyantra.com}
