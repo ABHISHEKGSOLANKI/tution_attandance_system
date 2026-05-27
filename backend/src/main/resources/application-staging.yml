@@ -1,22 +1,11 @@
 server:
-  port: ${SERVER_PORT:8084}
   servlet:
-    context-path: /tutionattendancesystemstg/api
+    context-path: /attendancesystemstg/api
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_staging?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${DB_USERNAME:admin}
-    password: ${DB_PASSWORD:3br15EE003}
-    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/tuition_attendance_staging?createDatabaseIfNotExist=true&serverTimezone=UTC}
 
 logging:
   level:
     com.tuition.attendance: INFO
-
-app:
-  profile-name: staging
-  cors:
-    allowed-origins:
-      - ${FRONTEND_ORIGIN:https://nirmaanyantra.com}
-      - ${FACE_SERVICE_ORIGIN:https://nirmaanyantra.com}
