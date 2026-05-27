@@ -8,10 +8,14 @@ export default function Registration() {
 
   return (
     <Layout title="Registration" subtitle="Register student faces and review account approval requests.">
-      <div className="stacked-page">
-        <div className="tab-switcher">
+      <div className="grid gap-5">
+        <div className="flex flex-wrap gap-3">
           <button
-            className={activeTab === "face" ? "tab-button active" : "tab-button"}
+            className={`rounded-2xl border px-5 py-3 text-sm font-semibold transition ${
+              activeTab === "face"
+                ? "border-[#163f69] bg-[#163f69] text-white"
+                : "border-[rgba(22,63,105,0.16)] bg-[rgba(255,255,255,0.78)] text-[#163f69]"
+            }`}
             type="button"
             onClick={() => setActiveTab("face")}
           >
@@ -19,7 +23,11 @@ export default function Registration() {
           </button>
 
           <button
-            className={activeTab === "approval" ? "tab-button active" : "tab-button"}
+            className={`rounded-2xl border px-5 py-3 text-sm font-semibold transition ${
+              activeTab === "approval"
+                ? "border-[#163f69] bg-[#163f69] text-white"
+                : "border-[rgba(22,63,105,0.16)] bg-[rgba(255,255,255,0.78)] text-[#163f69]"
+            }`}
             type="button"
             onClick={() => setActiveTab("approval")}
           >
@@ -27,7 +35,7 @@ export default function Registration() {
           </button>
         </div>
 
-        <div className="tab-content">
+        <div>
           {activeTab === "face" && <FaceRegistration activeTab={activeTab} />}
           {activeTab === "approval" && <ApprovalRequests activeTab={activeTab} />}
         </div>

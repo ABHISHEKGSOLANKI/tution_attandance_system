@@ -42,9 +42,8 @@ app:
     public-path: /uploads
   attendance-requests:
     auto-approve-cron: ${ATTENDANCE_AUTO_APPROVE_CRON:0 0 1 * * *}
-  app:
-    profile-name: ${ENV:dev}
-    cors:
-      allowed-origins:
-        - ${FRONTEND_ORIGIN:http://localhost:5173}
-        - ${FACE_SERVICE_ORIGIN:http://localhost:8091}
+  profile-name: ${ENV:dev}
+  cors:
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://localhost:5173}
+      - ${FACE_SERVICE_ORIGIN:http://localhost:8091}
