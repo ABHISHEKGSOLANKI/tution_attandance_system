@@ -1,6 +1,6 @@
-# Tuition Attendance System
+# Smart Attendance System
 
-A production-oriented attendance platform for tuition centers, designed for class 9th and 10th operations. The repository combines a secure Spring Boot backend, a React admin/student portal, a Python face-recognition service, and a desktop biometric middleware layer for future device integrations.
+A production-oriented attendance platform for education centers, designed for any class operations. The repository combines a secure Spring Boot backend, a React admin/student portal, a Python face-recognition service.
 
 ## Overview
 
@@ -8,7 +8,7 @@ This system supports:
 
 - student self-registration with admin approval
 - admin-managed attendance workflows
-- fingerprint-ready and face-recognition-ready attendance flows
+- face-recognition-ready attendance flows
 - JWT-based authentication and role-based access
 - first-login password reset
 - attendance reporting and dashboards
@@ -20,8 +20,7 @@ This system supports:
 Tution_attendance_system/
 ├── backend/                 Spring Boot REST API
 ├── frontend/                React + Vite admin/student web app
-├── face_attendance_service/ Python FastAPI + desktop face attendance tools
-├── desktopapp/              Java desktop biometric middleware
+├── face_attendance_service/ Python FastAPI + face attendance tools
 ├── AttendanceSystemPhotos/  Screenshots and architecture assets
 └── README.md
 ```
@@ -96,32 +95,13 @@ Stack:
 - FastAPI
 - OpenCV
 - `face_recognition`
-- Tkinter desktop UI
 
 Responsibilities:
 
 - face encoding registration
 - browser-based face attendance capture
-- desktop face attendance workflow
+- face attendance workflow
 - backend attendance callback integration
-
-### 4. Desktop Biometric Middleware
-
-Location: `desktopapp/`
-
-Stack:
-
-- Java
-- Spring Boot
-- JavaFX/Desktop integration path
-- biometric device abstraction
-
-Responsibilities:
-
-- biometric middleware orchestration
-- local capture logic
-- future fingerprint SDK integration
-- offline-first attendance sync support
 
 ## Key Functional Flows
 
@@ -138,10 +118,7 @@ Responsibilities:
 
 Supported attendance modes in this repository:
 
-- fingerprint-ready attendance flow
 - face-recognition attendance flow
-- browser-assisted face capture
-- desktop-assisted face capture
 
 Rules enforced:
 
@@ -238,13 +215,6 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8095
 ```
 
-## Desktop Middleware Setup
-
-```bash
-cd desktopapp
-mvn spring-boot:run
-```
-
 ## Environment Profiles
 
 All major applications in this repository are profile-aware.
@@ -337,4 +307,4 @@ Screenshots and architecture files used in this README are stored in:
 
 ## License / Usage
 
-This repository is currently documented as a project codebase without a dedicated open-source license file. Add a license if you intend to distribute or publish it publicly.
+This repository is currently documented as a project codebase without a dedicated open-source license file.
