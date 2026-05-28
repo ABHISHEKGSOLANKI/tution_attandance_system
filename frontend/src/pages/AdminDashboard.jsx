@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
   return (
     <Layout title="Dashboard" subtitle="Track registrations, attendance activity, and approval load from one place.">
-      <div className="grid gap-5 xl:grid-cols-3">
+      <div className="grid gap-5 xl:grid-cols-3 ">
         <section className="rounded-[24px] border border-[rgba(201,214,225,0.8)] bg-[rgba(255,255,255,0.78)] p-6 backdrop-blur-[14px]">
           <p className="text-sm font-medium text-slate-600">Total Students</p>
           <h2 className="mt-1 text-5xl font-bold text-slate-900">{loading ? "..." : summary.totalStudents}</h2>
