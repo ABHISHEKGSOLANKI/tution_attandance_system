@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { registerFaceSamples } from "../api/face";
+import { getStudentUsernameList } from "../api/admin";
 import Modal from "./Modal";
 import Canvas from "./Canvas";
 
@@ -10,6 +11,25 @@ export default function FaceRegistration( { activeTab } ) {
   const [busy, setBusy] = useState(false);
   const [canvasActive, setCanvasActive] = useState(false);
   const [modal, setModal] = useState({ open: false, tone: "success", title: "", message: "" });
+  const [studentUsernames, setStudentUsernames] = useState([]);
+
+    useEffect(() => {
+      async function loadStudentUsernames() {
+        try {
+          const response = await getStudentUsernameList();
+          setStudentUsernames(response);
+        }catch (error) {
+          setModal({
+            open: true,
+            tone: "error",
+            title: "Failed to load student list",
+            message: error.response?.data?.detail || "Could not load student username list for registration."
+          });
+        }
+      }
+  
+      loadStudentUsernames();
+    }, []);
 
   function openModal(tone, title, message) {
     setModal({ open: true, tone, title, message });
@@ -53,13 +73,25 @@ export default function FaceRegistration( { activeTab } ) {
         <div className="mt-5 grid gap-3">
           <label className="grid gap-2 text-sm font-semibold text-slate-700">
             <span>Student ID</span>
-            <input
-              type="text"
-              placeholder="Enter user ID, username, or admission ID"
+            <select
               value={studentId}
               onChange={(event) => setStudentId(event.target.value)}
               className="w-full rounded-2xl border border-slate-300 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-200"
-            />
+            >
+              <option value="">
+                Select Student Username
+              </option>
+
+              {studentUsernames.map((username, index) => (
+                <option
+                  key={index}
+                  value={username}
+                >
+                  {username}
+                </option>
+              ))}
+            </select>
+
           </label>
         </div>
 
