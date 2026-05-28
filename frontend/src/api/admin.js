@@ -37,3 +37,9 @@ export async function getAttendanceReport(filters) {
   const response = await client.get("/admin/attendance/report", { params });
   return response.data;
 }
+
+export async function getStudentUsernameList() {
+  const today = new Date().toISOString().slice(0, 10);
+  const studentsResponse = await client.get("/admin/dashboard/students");
+  return studentsResponse.data.map(student => student.username);
+}

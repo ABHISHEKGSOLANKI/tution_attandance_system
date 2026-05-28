@@ -13,7 +13,8 @@ public class StudentDtos {
             StudentClass studentClass,
             boolean approved,
             boolean biometricFaceRegistered,
-            double attendancePercentage
+            double attendancePercentage,
+            String username
     ) { }
 
     public record AdminAnalyticsResponse(

@@ -200,7 +200,8 @@ public class AttendanceService {
                         student.getStudentClass(),
                         student.isApproved(),
                         faceService.hasFaceRegistered(student),
-                        calculateAttendancePercentage(student.getId())
+                        calculateAttendancePercentage(student.getId()),
+                        student.getUsername()
                 ))
                 .toList();
 
